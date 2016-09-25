@@ -2,53 +2,54 @@
 
 var webpack = require('webpack'),
     path = require('path');
-    //jquery = require('jquery');
 
-var config = {
-    build : path.resolve(__dirname, '/dist')
+var configuration = {
+    entry : [
+        'webpack-dev-server/client?http://192.168.0.10:3000',
+        'webpack/hot/only-dev-server',
+        './src/index.js'
+    ],
+
+    output : {
+        path : path.resolve(__dirname, './build'),
+        filename : 'rawui.bundle.js',
+        publicPath : './assets/js/'
+    },
+
+    plugins : [
+        new webpack.optimize.UglifyJsPlugin({
+            compressor : {
+                screw_ie8 : true,
+                warning : false
+            },
+
+            output : {
+                comments : false
+            }
+        }),
+        new webpack.NoErrorsPlugin()
+    ]
 };
 
 module.exports = {
-    devTool : 'inline-source-map',
-    entry : {
-        layouts : [
-            'webpack-dev-server/client?http://localhost:3000',
-            'webpack/hot/only-dev-server',
-            './src/components/layouts/initialize.jsx'
-        ],
-        vendors : ['jquery']
-    },
-    output : {
-        path : config.build,
-        filename : '[name].bundle.js',
-        publicPath : '/assets/'
-    },
-    resolve : {
-        extensions : ['.jsx', '.js', '']
-    },
-    plugins : [
-        new webpack.NoErrorsPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
-        //new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.bundle.js', Infinity)
-    ],
+    devTool : '#source-map',
+    entry : configuration.entry,
+    output : configuration.output,
+    plugins : configuration.plugins,
     module : {
         loaders : [
             {
-                test : /\.jsx?$/,
+                test : /\.js?$/,
                 loader : 'babel-loader',
                 exclude : /node_modules/,
                 query : {
                     cacheDirectory : true,
-                    presets : ['es2015', 'react']
+                    preset : ['es2015']
                 }
             },
             {
                 test : /\.css$/,
-                loader : 'style!css?modules&localIndentName=[name]---[local]---[hash:base64:5]'
-            },
-            {
-                test : /\.html$/,
-                loader : 'file?name=[name].[ext]'
+                loader : 'css-loader'
             }
         ]
     }
